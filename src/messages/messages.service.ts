@@ -33,6 +33,19 @@ export class MessagesService {
         return this.messageModel.find({ $or: [{ from: userId }, { to: userId }] }).populate('from').populate('to').exec();
     }
 
+    async getLast30Messages(userId: string, fromId: string): Promise<Message[]> {
+        
+        return this.messageModel. find({
+            $or: [
+                { from: userId, to: fromId },
+                { from: fromId, to: userId }
+            ]
+        })
+        .sort({ createdAt: 'desc' })
+        .limit(30)
+        .exec();
+    }
+
     async deleteMessage(id: string): Promise<Message> {
         return this.messageModel.findByIdAndDelete(id).exec();
     }
