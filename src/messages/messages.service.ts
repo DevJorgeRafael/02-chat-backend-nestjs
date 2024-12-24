@@ -14,6 +14,17 @@ export class MessagesService {
         return message.save();
     }
 
+    async saveMessage(payload: { from: string; to: string; message: string }): Promise<boolean> {
+        try {
+            const message = new this.messageModel(payload);
+            await message.save();
+            return true;
+        } catch (error) {
+            console.error('Failed to save message:', error);
+            return false;
+        }
+    }
+
     async getAllMessages(): Promise<Message[]> {
         return this.messageModel.find().populate('from').populate('to').exec();
     } 

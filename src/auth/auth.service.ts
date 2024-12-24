@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -24,16 +24,25 @@ export class AuthService {
             password: hashedPassword,
         });
 
-        const token = this.generateToken(newUser.id);
-        return { user: newUser, token };
+        const token = await this.generateToken(newUser.id);
+        return { user: newUser, token: token };
     }
 
     async login(email: string, password: string) {
         const user = await this.usersService.findByEmail(email);
 
-        if( !user || !bcrypt.compareSync(password, user.password)) {
-            throw new BadRequestException('Invalid credentials');
+        if (!user) {
+            throw new BadRequestException('Email not found');
         }
+
+        if( !bcrypt.compareSync(password, user.password)) {
+            throw new BadRequestException('Incorrect password');
+        }
+
+        const token = await this.generateToken(user.id);
+
+        const { password: _, ...userWithOutPassowrd } = user.toObject();
+        return { user: userWithOutPassowrd, token };
     }
 
     // Renovación del token
@@ -55,16 +64,19 @@ export class AuthService {
     }
 
     async generateToken(userId: string): Promise<string> {
-        return this.jwtService.signAsync(
+        console.log('JWT_KEY:', process.env.JWT_KEY); 
+        const token = await this.jwtService.signAsync(
             { uid: userId },
             { 
                 secret: process.env.JWT_KEY,
                 expiresIn: '24h'
             },
         )
+        console.log('Generated token:', token);  
+        return token;
     }
 
-    private async verifyToken(token: string): Promise<{ valid: boolean; uid: string | null }> {
+    async verifyToken(token: string): Promise<{ valid: boolean; uid: string | null }> {
         try {
             const decoded = this.jwtService.verify(token, { secret: process.env.JWT_KEY });
             return { valid: true, uid: decoded.uid };

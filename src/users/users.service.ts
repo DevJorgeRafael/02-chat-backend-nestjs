@@ -23,7 +23,11 @@ export class UsersService {
         return this.userModel.findOne({ email });
     }
 
-    async updateOnlineStatus(userId: string, isOnline: boolean): Promise<void> {
-        await this.userModel.findByIdAndUpdate(userId, { online: isOnline });
+    async updateOnlineStatus(userId: string, isOnline: boolean): Promise<User | null> {
+        return await this.userModel.findByIdAndUpdate(
+            userId, 
+            { online: isOnline },
+            { new: true } // Retornar el documento actualizado
+        );
     }
 }

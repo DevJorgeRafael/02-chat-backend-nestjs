@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
 
 
 @Schema()
@@ -21,6 +22,6 @@ export class User extends Document {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject() as any;
+    const { __v, _id, password, ...object } = this.toObject() as any;
     return { ...object, id: _id };
 })
