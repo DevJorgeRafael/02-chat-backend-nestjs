@@ -16,18 +16,25 @@ export class UsersService {
     }
 
     async findById(id: string): Promise<User | null> {
-        return this.userModel.findById(id);
+        const user = await this.userModel.findById(id);
+        return user ? user.toJSON() : null;
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        return this.userModel.findOne({ email });
+        return await this.userModel.findOne({ email }).select('+password');
     }
 
     async updateOnlineStatus(userId: string, isOnline: boolean): Promise<User | null> {
-        return await this.userModel.findByIdAndUpdate(
+        const user = await this.userModel.findByIdAndUpdate(
             userId, 
             { online: isOnline },
             { new: true } // Retornar el documento actualizado
         );
+        return user ? user.toJSON() : null;
+    }
+
+    async findAll(): Promise<User[]> {
+        const users = await this.userModel.find();
+        return users.map(user => user.toJSON());
     }
 }

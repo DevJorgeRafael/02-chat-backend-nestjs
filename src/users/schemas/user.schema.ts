@@ -23,5 +23,6 @@ export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.method('toJSON', function () {
     const { __v, _id, password, ...object } = this.toObject() as any;
-    return { ...object, id: _id };
+    object.id = _id;
+    return object;
 })
