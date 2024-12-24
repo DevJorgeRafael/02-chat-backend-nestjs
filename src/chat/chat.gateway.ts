@@ -85,8 +85,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.to(payload.to).emit('mensaje-personal', payload);
   }
 
-
-
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {
     return 'Hello world!';

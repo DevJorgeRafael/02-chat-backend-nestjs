@@ -30,22 +30,22 @@ export class AuthService {
 
     async login(email: string, password: string) {
         const user = await this.usersService.findByEmail(email);
-
+        
         if (!user) {
             throw new BadRequestException('Email not found');
         }
-
+        
         if( !bcrypt.compareSync(password, user.password)) {
             throw new BadRequestException('Incorrect password');
         }
 
         const token = await this.generateToken(user.id);
 
-        const { password: _, ...userWithOutPassowrd } = user.toObject();
-        return { user: userWithOutPassowrd, token };
+        const userToFrontend = user.toJSON();
+        return { user: userToFrontend, token: token };
+       
     }
 
-    // Renovación del token
     async renewToken(token: string) {
         const { valid, uid } = await this.verifyToken(token);
 
@@ -64,15 +64,13 @@ export class AuthService {
     }
 
     async generateToken(userId: string): Promise<string> {
-        console.log('JWT_KEY:', process.env.JWT_KEY); 
         const token = await this.jwtService.signAsync(
             { uid: userId },
             { 
                 secret: process.env.JWT_KEY,
                 expiresIn: '24h'
             },
-        )
-        console.log('Generated token:', token);  
+        ) 
         return token;
     }
 
