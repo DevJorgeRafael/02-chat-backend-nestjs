@@ -8,8 +8,11 @@ export class Message extends Document {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
     from: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     to: string;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
+    room: string;
 
     @Prop({ required: true })
     message: string;
