@@ -14,7 +14,19 @@ import mongoose from 'mongoose';
   exports: [MongooseModule],
 })
 export class DatabaseModule implements OnModuleInit {
+
+  
   async onModuleInit() {
+    mongoose.set('toJSON', {
+      virtuals: true,
+      versionKey: false,
+      transform: (doct, ret) => {
+        const { _id, password, __v, ...rest } = ret;
+        rest.id = _id;
+        return rest;
+      }
+    })
+    
     mongoose.connection.on('connected', () => {
       console.log('>>> DB IS CONNECTED')
     });
