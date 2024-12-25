@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { MessagesService } from 'src/messages/messages.service';
+import { MessagesService } from 'src/messages/services/messages.service';
 import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({

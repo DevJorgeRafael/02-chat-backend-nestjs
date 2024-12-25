@@ -40,10 +40,7 @@ export class AuthService {
         }
 
         const token = await this.generateToken(user.id);
-
-        const userToFrontend = user.toJSON();
-        return { user: userToFrontend, token: token };
-       
+        return { user, token };
     }
 
     async renewToken(token: string) {

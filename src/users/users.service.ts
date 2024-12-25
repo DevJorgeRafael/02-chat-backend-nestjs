@@ -21,7 +21,8 @@ export class UsersService {
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        return await this.userModel.findOne({ email }).select('+password');
+        const user = await this.userModel.findOne({ email });
+        return user?.toJSON() || null; 
     }
 
     async updateOnlineStatus(userId: string, isOnline: boolean): Promise<User | null> {
