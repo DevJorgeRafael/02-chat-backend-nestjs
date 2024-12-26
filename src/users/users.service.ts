@@ -22,7 +22,7 @@ export class UsersService {
 
     async findByEmail(email: string): Promise<User | null> {
         const user = await this.userModel.findOne({ email });
-        return user?.toJSON() || null; 
+        return user || null; 
     }
 
     async updateOnlineStatus(userId: string, isOnline: boolean): Promise<User | null> {
