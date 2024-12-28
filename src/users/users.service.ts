@@ -34,8 +34,11 @@ export class UsersService {
         return user ? user.toJSON() : null;
     }
 
-    async findAll(): Promise<User[]> {
-        const users = await this.userModel.find();
+    async findAll(userId: string): Promise<User[]> {
+        const users = await this.userModel.find(
+            { _id: { $ne: userId } }, // Excluir al usuario actual
+            { password: 0 }
+        );
         return users.map(user => user.toJSON());
     }
 }
