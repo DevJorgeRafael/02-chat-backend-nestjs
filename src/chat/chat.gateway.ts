@@ -63,7 +63,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('mensaje-personal')
   async handlePersonalMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { from: string; to: string; message: string },
+    @MessageBody() payload: { from: string; to: string; message?: string; type: string; fileBuffer?: Buffer; fileName?: string; mimeType?: string },
   ) {
     const uid = client.data.uid;
     if (!uid) {
@@ -75,6 +75,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       from: uid,
       to: payload.to,
       message: payload.message,
+      type: payload.type,
+      fileBuffer: payload.fileBuffer,
+      fileName: payload.fileName,
+      mimeType: payload.mimeType,
     })
 
     if (!isMessageSaved) {
