@@ -2,28 +2,55 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Message } from '../schemas/message.schema';
 import { Model } from 'mongoose';
+import { GridFsService } from './gridfs.service';
 
 @Injectable()
 export class MessagesService {
     constructor(
-        @InjectModel(Message.name) private readonly messageModel: Model<Message>
+        @InjectModel(Message.name) private readonly messageModel: Model<Message>,
+        private readonly gridFsService: GridFsService,
     ) {}
 
-    async createMessage(data: any): Promise<Message> {
-        const message = new this.messageModel(data);
+    async createMessage(payload: { from: string; to: string; message?: string; type: string; fileId?: string }): Promise<Message> {
+        const message = new this.messageModel(payload);
         return message.save();
     }
 
-    async saveMessage(payload: { from: string; to: string; message: string }): Promise<boolean> {
+    async saveMessage(payload: {
+        from: string;
+        to: string;
+        message?: string;
+        type: string;
+        fileBuffer?: Buffer;
+        fileName?: string;
+        mimeType?: string;
+    }): Promise<Message | null> {
         try {
-            const message = new this.messageModel(payload);
-            await message.save();
-            return true;
+            let fileId: string | undefined;
+
+            if (payload.fileBuffer && payload.fileName && payload.mimeType) {
+                fileId = await this.gridFsService.uploadFile(payload.fileBuffer, payload.fileName, payload.mimeType);
+            }
+
+            const messagePayload: any = {
+                from: payload.from,
+                to: payload.to,
+                // message: payload.message ?? "",
+                type: payload.type,
+                fileId,
+            };
+
+            if(payload.message) {
+                messagePayload.message = payload.message;
+            }
+
+            return await this.createMessage(messagePayload);
         } catch (error) {
-            console.error('Failed to save message:', error);
-            return false;
+            console.error("Error saving message:", error);
+            return null;
         }
     }
+
 
     async getAllMessages(): Promise<Message[]> {
         return this.messageModel.find().populate('from').populate('to').exec();

@@ -14,8 +14,14 @@ export class Message extends Document {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
     room: string;
 
-    @Prop({ required: true })
-    message: string;
+    @Prop()
+    message?: string;
+
+    @Prop({ type: String, enum: ['text', 'video', 'image', 'file'], required: true })
+    type: string;
+
+    @Prop()
+    fileId?: string;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

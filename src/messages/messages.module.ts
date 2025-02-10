@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { RoomsController } from './controllers/rooms.controller';
 import { RoomsService } from './services/rooms.service';
 import { Room, RoomSchema } from './schemas/room.schema';
+import { GridFsService } from './services/gridfs.service';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { Room, RoomSchema } from './schemas/room.schema';
     AuthModule,
   ],
   controllers: [MessagesController, RoomsController],
-  providers: [MessagesService, RoomsService],
-  exports: [MessagesService, RoomsService]
+  providers: [MessagesService, RoomsService, GridFsService],
+  exports: [MessagesService, RoomsService, GridFsService]
 })
 export class MessagesModule {}
