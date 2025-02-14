@@ -24,9 +24,10 @@ export class MessagesService {
         fileBuffer?: Buffer;
         fileName?: string;
         mimeType?: string;
+        fileId?: string;
     }): Promise<Message | null> {
         try {
-            let fileId: string | undefined;
+            let fileId = payload.fileId;
 
             if (payload.fileBuffer && payload.fileName && payload.mimeType) {
                 fileId = await this.gridFsService.uploadFile(payload.fileBuffer, payload.fileName, payload.mimeType);

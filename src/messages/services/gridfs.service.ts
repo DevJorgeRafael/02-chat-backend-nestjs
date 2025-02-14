@@ -2,14 +2,15 @@ import { Injectable } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/mongoose";
 import mongoose, { Connection } from "mongoose";
 import { Readable } from "stream";
-import { GridFSBucket, ObjectId } from "mongodb";
+import { GridFSBucket, ObjectId, Db } from "mongodb";
 
 @Injectable()
 export class GridFsService {
     private bucket: GridFSBucket;
 
     constructor(@InjectConnection() private readonly connection: Connection) {
-        this.bucket = new GridFSBucket(this.connection.db, { bucketName: 'uploads' });
+        const db = this.connection.db as unknown as Db;
+        this.bucket = new GridFSBucket(db, { bucketName: 'uploads' });
     }
 
     async uploadFile(buffer: Buffer, filename: string, mimeType: string): Promise<any> {
@@ -73,13 +74,7 @@ export class GridFsService {
             try {
                 const objectId = new ObjectId(id);
 
-                this.bucket.delete(objectId, (err) => {
-                    if (err) {
-                        reject("Failed to delete file");
-                    } else {
-                        resolve();
-                    }
-                });
+                this.bucket.delete(objectId).then(() => resolve()).catch(reject);
             } catch (error) {
                 reject('Invalid file ID format');
             }
